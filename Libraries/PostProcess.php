@@ -1,6 +1,6 @@
 <?php
 
-	namespace DataTablesBundle\Libraries;
+	namespace Nemke\DataTablesBundle\Libraries;
     use Doctrine\ORM\EntityManager;
     use Symfony\Component\HttpFoundation\Request;
 

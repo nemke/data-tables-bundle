@@ -4,7 +4,7 @@
 	
 	use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-	use DataTablesBundle\DependencyInjection\DataTablesExtension;
+	use Nemke\DataTablesBundle\DependencyInjection\DataTablesExtension;
 	
 	class DataTablesBundle extends Bundle
 	{

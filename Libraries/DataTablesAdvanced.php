@@ -1,6 +1,6 @@
 <?php
 
-	namespace DataTablesBundle\Libraries;
+	namespace Nemke\DataTablesBundle\Libraries;
 
 	use Symfony\Component\HttpFoundation\Request;
     use Symfony\Component\Validator\Constraints as Assert;
