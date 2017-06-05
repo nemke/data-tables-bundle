@@ -1,0 +1,29 @@
+{
+	"name" : "nemke/data-tables-bundle",
+	"type" : "symfony-bundle",
+	"description" : "DataTables bundle for Symfony",
+	"keywords" : [
+		"data-tables",
+		"data",
+		"tables",
+		"symfony"
+	],
+	"homepage" : "https://nemke.info/",
+	"license" : "MIT",
+	"authors" : [{
+			"name" : "Nemanja Andrejevic",
+			"email" : "andrejevicnemanja@gmail.com",
+			"homepage" : "https://www.nmdesign.rs/"
+		}
+	],
+	"require" : {
+		"symfony/framework-bundle" : ">=2.1",
+		"doctrine/doctrine-bundle" : ">=1.6"
+	},
+	"autoload" : {
+		"psr-0" : {
+			"Nemke\\DataTablesBundle" : ""
+		}
+	},
+	"target-dir" : "Nemke/DataTablesBundle"
+}
