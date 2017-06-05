@@ -1,6 +1,6 @@
 <?php
 
-	namespace DataTablesBundle;
+	namespace Nemke\DataTablesBundle;
 	
 	use Symfony\Component\HttpKernel\Bundle\Bundle;
 
