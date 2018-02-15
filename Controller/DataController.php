@@ -60,9 +60,10 @@ class DataController extends Controller
             throw new Exception('Unknown entity.');
 
         // Setting entity and search columns
+        $dataTables->setEntity($bundle . ':' . $entity);
+
         $dataTables->setTableColumns($entity_options[self::COLUMNS]);
         $dataTables->setSearchingColumns($entity_options[self::SEARCH_COLUMNS]);
-        $dataTables->setEntity($bundle . ':' . $entity);
         $dataTables->setPostProcessing($entity_options[self::POST_PROCESSING]);
 
         // Setting limits by user
