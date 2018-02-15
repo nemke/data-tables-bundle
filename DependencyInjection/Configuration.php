@@ -47,7 +47,7 @@
                                     ->defaultValue('')
 								->end()
 								->scalarNode('user_limit')
-									->defaultValue('false')
+									->defaultValue(0)
 								->end()
 								->arrayNode('associative_columns')
 									->prototype('array')
