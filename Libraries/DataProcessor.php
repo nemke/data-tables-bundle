@@ -149,9 +149,6 @@
 		{
 		    $this->entity = $entity;
 
-			// Gathering table columns
-			$this->table = $this->entityManager->getClassMetadata($entity)->getTableName();
-
 		    return $this;
 		}
 
@@ -163,7 +160,11 @@
          */
 		public function setTableColumns($table_columns)
 		{
-		    $this->table_columns = $table_columns;
+            // Gathering table columns
+		    if (empty($table_columns))
+                $this->table_columns = $this->entityManager->getClassMetadata($this->entity)->getTableName();
+		    else
+		        $this->table_columns = $table_columns;
 
 		    return $this;
 		}
