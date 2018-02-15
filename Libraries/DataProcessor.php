@@ -2,7 +2,8 @@
 
 	namespace Nemke\DataTablesBundle\Libraries;
 
-	use Symfony\Component\HttpFoundation\Request;
+    use Doctrine\Common\Persistence\ObjectManager;
+    use Symfony\Component\HttpFoundation\Request;
     use Symfony\Component\Validator\Constraints as Assert;
 	use Doctrine\ORM\EntityManager;
 
@@ -11,7 +12,7 @@
 	 *
 	 * @author  Nemanja Andrejevic
 	 */
-	class DataTablesAdvanced
+	class DataProcessor
 	{
 		const FIELD = 'field';
 		const TABLE = 'table';
@@ -73,7 +74,7 @@
 		/**
 		 * Holder for entity manager
 		 */
-		private $em;
+		private $entityManager;
         
         /**
          * @var Request
@@ -85,6 +86,23 @@
 		 */
 		private $userLimit;
 
+
+        /**
+         * Holder for user id
+         */
+        private $userId;
+
+        /**
+         * DataProcessor constructor.
+         * @param ObjectManager $entityManager
+         * @param Request $request
+         */
+        public function __construct(ObjectManager $entityManager, Request $request)
+        {
+            $this->entityManager = $entityManager;
+            $this->request = $request;
+        }
+
 		/**
 		 * @return mixed
 		 */
@@ -95,18 +113,13 @@
 
 		/**
 		 * @param mixed $userLimit
-		 * @return DataTablesAdvanced
+		 * @return DataProcessor
 		 */
 		public function setUserLimit($userLimit)
 		{
 			$this->userLimit = $userLimit;
 			return $this;
 		}
-
-		/**
-		 * Holder for user id
-		 */
-		private $userId;
 
 		/**
 		 * @return mixed
@@ -118,7 +131,7 @@
 
 		/**
 		 * @param mixed $userId
-		 * @return DataTablesAdvanced
+		 * @return DataProcessor
 		 */
 		public function setUserId($userId)
 		{
@@ -127,39 +140,27 @@
 		}
         
         /**
-         * Class constructor
+         * Set entity
          *
-         * @param EntityManager $em
-         * @param Request $request
+         * @param string $entity
+         * @return DataProcessor
          */
-		public function __construct(EntityManager $em, Request $request)
-		{
-			$this->em = $em;
-            $this->request = $request;
-		}
-
-		/**
-		 * Set entity
-		 *
-		 * @param string $entity
-		 * @return \DataTablesBundle\Libraries\DataTablesAdvanced
-		 */
 		public function setEntity($entity)
 		{
 		    $this->entity = $entity;
 
 			// Gathering table columns
-			$this->table = $this->em->getClassMetadata($entity)->getTableName();
+			$this->table = $this->entityManager->getClassMetadata($entity)->getTableName();
 
 		    return $this;
 		}
 
-		/**
-		 * Set table columns
-		 *
-		 * @param string $table_columns
-		 * @return \DataTablesBundle\Libraries\DataTablesAdvanced
-		 */
+        /**
+         * Set table columns
+         *
+         * @param string $table_columns
+         * @return DataProcessor
+         */
 		public function setTableColumns($table_columns)
 		{
 		    $this->table_columns = $table_columns;
@@ -167,12 +168,12 @@
 		    return $this;
 		}
 
-		/**
-		 * Set association columns
-		 *
-		 * @param string $association_columns
-		 * @return \DataTablesBundle\Libraries\DataTablesAdvanced
-		 */
+        /**
+         * Set association columns
+         *
+         * @param string $association_columns
+         * @return DataProcessor
+         */
 		public function setAssociationColumns($association_columns)
 		{
 		    $this->association_columns = $association_columns;
@@ -180,12 +181,12 @@
 		    return $this;
 		}
 
-		/**
-		 * Set sorting columns
-		 *
-		 * @param string $sorting_columns
-		 * @return \DataTablesBundle\Libraries\DataTablesAdvanced
-		 */
+        /**
+         * Set sorting columns
+         *
+         * @param array $sorting_columns
+         * @return DataProcessor
+         */
 		public function setSortingColumns($sorting_columns)
 		{
 		    $this->sorting_columns = $sorting_columns;
@@ -193,12 +194,12 @@
 		    return $this;
 		}
 
-		/**
-		 * Set searching columns
-		 *
-		 * @param string $searching_columns
-		 * @return \DataTablesBundle\Libraries\DataTablesAdvanced
-		 */
+        /**
+         * Set searching columns
+         *
+         * @param string $searching_columns
+         * @return DataProcessor
+         */
 		public function setSearchingColumns($searching_columns)
 		{
 		    $this->searching_columns = $searching_columns;
@@ -210,7 +211,7 @@
 		 * Set search
 		 *
 		 * @param string $search
-		 * @return \DataTablesBundle\Libraries\DataTablesAdvanced
+         * @return DataProcessor
 		 */
 		public function setSearch($search)
 		{
@@ -219,12 +220,12 @@
 		    return $this;
 		}
 
-		/**
-		 * Set start
-		 *
-		 * @param string $start
-		 * @return \DataTablesBundle\Libraries\DataTablesAdvanced
-		 */
+        /**
+         * Set start
+         *
+         * @param string $start
+         * @return DataProcessor
+         */
 		public function setStart($start)
 		{
 		    $this->start = $start;
@@ -232,12 +233,12 @@
 		    return $this;
 		}
 
-		/**
-		 * Set length
-		 *
-		 * @param string $length
-		 * @return \DataTablesBundle\Libraries\DataTablesAdvanced
-		 */
+        /**
+         * Set length
+         *
+         * @param string $length
+         * @return DataProcessor
+         */
 		public function setLength($length)
 		{
 		    $this->length = $length;
@@ -249,7 +250,7 @@
          * Set post processing
          *
          * @param $postProcessing
-         * @return DataTablesAdvanced
+         * @return DataProcessor
          */
 		public function setPostProcessing($postProcessing)
 		{
@@ -266,10 +267,10 @@
 	    public function Get()
 	    {
 	    	$association_column_aliases = array();
-	    	$connection = $this->em->getConnection();
+	    	$connection = $this->entityManager->getConnection();
 			$query_builder = $connection->createQueryBuilder();
 
-			$alias = $this->getTableAlias($this->table);
+			$alias = TableOperations::getAlias($this->table);
             $query_builder
             	->select($alias . '.*')
             	->from($this->table, $alias);
@@ -279,7 +280,7 @@
 			{
 				foreach ($this->association_columns as $association)
 				{
-					$join_alias = $this->getTableAlias($association[self::TABLE]);
+					$join_alias = TableOperations::getAlias($association[self::TABLE]);
 
 					// Building select for every association
 					foreach ($association[self::TARGET_FIELDS] as $field)
@@ -355,7 +356,7 @@
              */
             if (!empty($this->postProcessing))
             {
-                $postProcessingClass = new $this->postProcessing($this->em, $this->request);
+                $postProcessingClass = new $this->postProcessing($this->entityManager, $this->request);
 				/** @noinspection PhpUndefinedMethodInspection */
 				$data = $postProcessingClass->process($data);
             }
@@ -371,7 +372,7 @@
 	    public function GetCount()
 	    {
 	    	// Counting all rows
-	    	$repository = $this->em->getRepository($this->entity);
+	    	$repository = $this->entityManager->getRepository($this->entity);
 			$query_builder = $repository->createQueryBuilder('dt');
 			$query_builder->select('COUNT(dt)');
 
@@ -388,10 +389,10 @@
 	    public function GetFilteredCount()
 	    {
 	    	$association_column_aliases = array();
-	    	$connection = $this->em->getConnection();
+	    	$connection = $this->entityManager->getConnection();
 			$query_builder = $connection->createQueryBuilder();
 
-			$alias = $this->getTableAlias($this->table);
+			$alias = TableOperations::getAlias($this->table);
             $query_builder
             	->select('count(*)')
             	->from($this->table, $alias);
@@ -401,7 +402,7 @@
 			{
 				foreach ($this->association_columns as $association)
 				{
-					$join_alias = $this->getTableAlias($association[self::TABLE]);
+					$join_alias = TableOperations::getAlias($association[self::TABLE]);
 
 					// Building select for every association
 					foreach ($association[self::TARGET_FIELDS] as $field)
@@ -435,36 +436,5 @@
 			$query = $query_builder->execute();
 
 			return $query->fetchColumn();
-	    }
-
-		/**
-		 * Get Table alias
-		 *
-		 * @param $table
-		 * @return string
-		 */
-	    private function getTableAlias($table)
-	    {
-            $alias = '';
-			if (mb_strpos($table, '_') !== FALSE)
-			{
-				$table_name_parts = explode('_', $table);
-				foreach ($table_name_parts as $part)
-					$alias .= mb_substr($part, 0, 2, 'utf-8');
-			}
-			else
-            {
-                $tableWords = preg_split('/(?=[A-Z])/', $table, -1, PREG_SPLIT_NO_EMPTY);
-
-                if (count($tableWords) > 1)
-                {
-                    foreach ($tableWords as $word)
-                        $alias .= mb_substr($word, 0, 2, 'utf-8');
-                }
-                else
-                    $alias = mb_substr($table, 0, 4, 'utf-8');
-            }
-
-			return $alias;
 	    }
 	}

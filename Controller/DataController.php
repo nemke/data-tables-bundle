@@ -8,7 +8,7 @@
 	use Symfony\Component\HttpFoundation\Response;
 	use Symfony\Component\HttpFoundation\JsonResponse;
 
-	use Nemke\DataTablesBundle\Libraries\DataTablesAdvanced;
+	use Nemke\DataTablesBundle\Libraries\DataProcessor;
 
 	use \Exception as Exception;
 
@@ -29,7 +29,7 @@
 		const USER_LIMIT = 'user_limit';
 
 		/**
-		 * @Route("/dataTables/{bundle}/{entity}/", name="dataTables")
+		 * @Route("/api/dataTables/{bundle}/{entity}/", name="dataTables")
 		 * @Method("POST")
 		 * @param $bundle
 		 * @param $entity
@@ -39,8 +39,8 @@
 	    public function Data($bundle, $entity)
 	    {
 	    	// Initializing Data Tables
-	    	$em = $this->getDoctrine()->getManager();
-			$dataTables = new DataTablesAdvanced($em, $this->get('request_stack')->getCurrentRequest());
+	    	$entityManager = $this->getDoctrine()->getManager();
+			$dataTables = new DataProcessor($entityManager, $this->get('request_stack')->getCurrentRequest());
 
 			// Loading entities configuration
 			$data_tables_entities = $this->getParameter('data_tables.entities');
@@ -88,7 +88,7 @@
 			// Column ordering part
 			if (isset($_POST['order']) && ($_POST['order'][0] !== FALSE))
 			{
-				$sorting_columns = array();
+				$sorting_columns = [];
 
 				for($i = 0; $i < count($_POST['order']); $i++)
 				{

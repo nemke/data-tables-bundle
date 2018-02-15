@@ -36,6 +36,7 @@
 									->prototype('scalar')
 										->cannotBeEmpty()
 									->end()
+                                    ->defaultValue([])
 								->end()
 								->arrayNode('search_columns')
 									->prototype('scalar')
